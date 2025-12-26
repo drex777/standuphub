@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}Регистрация - StandUp Hub{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0">Регистрация</h3>
+            </div>
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                            <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for error in form.non_field_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="mb-3">
+                        {{ form.email.label_tag }}
+                        {{ form.email }}
+                        {% if form.email.help_text %}
+                        <div class="form-text">{{ form.email.help_text }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            {{ form.first_name.label_tag }}
+                            {{ form.first_name }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.last_name.label_tag }}
+                            {{ form.last_name }}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.phone.label_tag }}
+                        {{ form.phone }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.password1.label_tag }}
+                        {{ form.password1 }}
+                        {% if form.password1.help_text %}
+                        <div class="form-text">{{ form.password1.help_text }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.password2.label_tag }}
+                        {{ form.password2 }}
+                        {% if form.password2.help_text %}
+                        <div class="form-text">{{ form.password2.help_text }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="bi bi-person-plus"></i> Зарегистрироваться
+                        </button>
+                    </div>
+                </form>
+                
+                <hr class="my-4">
+                
+                <p class="text-center">
+                    Уже есть аккаунт? <a href="{% url 'login' %}">Войдите здесь</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.querySelector('form').addEventListener('submit', function(e) {
+    const email = document.querySelector('input[name="email"]').value;
+    const password1 = document.querySelector('input[name="password1"]').value;
+    const password2 = document.querySelector('input[name="password2"]').value;
+    
+    if (!email.includes('@')) {
+        alert('Введите корректный email');
+        e.preventDefault();
+        return false;
+    }
+    
+    if (password1.length < 8) {
+        alert('Пароль должен быть не менее 8 символов');
+        e.preventDefault();
+        return false;
+    }
+    
+    if (password1 !== password2) {
+        alert('Пароли не совпадают');
+        e.preventDefault();
+        return false;
+    }
+});
+</script>
+{% endblock %}

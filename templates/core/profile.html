@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Личный кабинет - StandUp Hub{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Личный кабинет</h1>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Мой профиль</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Имя:</strong> {{ user.get_full_name|default:"Не указано" }}</p>
+                <p><strong>Email:</strong> {{ user.email }}</p>
+                <p><strong>Телефон:</strong> {{ user.phone|default:"Не указан" }}</p>
+                <p><strong>Роль:</strong> {{ user.get_role_display }}</p>
+                <a href="#" class="btn btn-outline-primary btn-sm">Редактировать</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Мои бронирования</h5>
+            </div>
+            <div class="card-body">
+                {% if bookings %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Код</th>
+                                    <th>Мероприятие</th>
+                                    <th>Дата</th>
+                                    <th>Места</th>
+                                    <th>Статус</th>
+                                    <th>Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for booking in bookings %}
+                                    <tr>
+                                        <td><code>{{ booking.booking_code }}</code></td>
+                                        <td>{{ booking.event.title }}</td>
+                                        <td>{{ booking.event.date }}</td>
+                                        <td>{{ booking.seats }}</td>
+                                        <td>
+                                            <span class="badge bg-{% if booking.status == 'confirmed' %}success{% elif booking.status == 'pending' %}warning{% else %}danger{% endif %}">
+                                                {{ booking.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {% if booking.status == 'pending' %}
+                                                <a href="{% url 'cancel_booking' booking.id %}" class="btn btn-sm btn-outline-danger">
+                                                    Отменить
+                                                </a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        У вас пока нет бронирований. 
+                        <a href="{% url 'home' %}">Посмотрите афишу</a> и забронируйте места на концерт!
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

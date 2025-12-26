@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ event.title }} - StandUp Hub{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <h1>{{ event.title }}</h1>
+        
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <p><i class="bi bi-calendar-event"></i> <strong>Дата:</strong> {{ event.date }}</p>
+                        <p><i class="bi bi-clock"></i> <strong>Время:</strong> {{ event.time|time:"H:i" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><i class="bi bi-cash"></i> <strong>Цена:</strong> {{ event.price }} руб.</p>
+                        <p><i class="bi bi-info-circle"></i> <strong>Статус:</strong> 
+                            <span class="badge bg-{% if event.status == 'active' %}success{% elif event.status == 'cancelled' %}danger{% else %}secondary{% endif %}">
+                                {{ event.get_status_display }}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+                
+                <h5>Участники:</h5>
+                <div class="mb-3">
+                    {% for comedian in event.comedians.all %}
+                        <span class="badge bg-primary me-2">{{ comedian.name }}</span>
+                    {% endfor %}
+                </div>
+                
+                <h5>Описание:</h5>
+                <p>{{ event.description }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Забронировать места</h5>
+            </div>
+            <div class="card-body">
+                {% if can_book %}
+                    {% if user.is_authenticated %}
+                        <form method="post" action="{% url 'create_booking' event.id %}">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="seats" class="form-label">Количество мест</label>
+                                <select class="form-select" id="seats" name="seats">
+                                    <option value="1">1 место</option>
+                                    <option value="2">2 места</option>
+                                    <option value="3">3 места</option>
+                                    <option value="4">4 места</option>
+                                </select>
+                            </div>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-success btn-lg">
+                                    <i class="bi bi-check-circle"></i> Забронировать
+                                </button>
+                            </div>
+                        </form>
+                    {% else %}
+                        <div class="alert alert-warning">
+                            <p>Для бронирования необходимо войти в систему</p>
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'login' %}?next={% url 'event_detail' event.id %}" class="btn btn-primary">
+                                    Войти
+                                </a>
+                                <a href="{% url 'register' %}" class="btn btn-outline-primary">
+                                    Зарегистрироваться
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="alert alert-secondary">
+                        Бронирование для этого мероприятия недоступно
+                    </div>
+                {% endif %}
+                
+                <hr class="my-3">
+                
+                <div class="text-muted small">
+                    <p><i class="bi bi-info-circle"></i> После бронирования вам будет выдан уникальный код</p>
+                    <p><i class="bi bi-credit-card"></i> Оплата производится на входе в клуб</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

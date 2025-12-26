@@ -1,0 +1,88 @@
+{% extends 'core/admin/base.html' %}
+
+{% block title %}Дашборд - Админ-панель{% endblock %}
+
+{% block content %}
+<h1 class="h2 mb-4">Дашборд</h1>
+
+<div class="row">
+    <div class="col-md-3 mb-4">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <h5 class="card-title">Пользователи</h5>
+                <h2 class="display-6">{{ stats.total_users }}</h2>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <h5 class="card-title">Мероприятия</h5>
+                <h2 class="display-6">{{ stats.total_events }}</h2>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <h5 class="card-title">Всего броней</h5>
+                <h2 class="display-6">{{ stats.total_bookings }}</h2>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <h5 class="card-title">Ожидают подтверждения</h5>
+                <h2 class="display-6">{{ stats.pending_bookings }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header">
+        <h5 class="mb-0">Последние бронирования</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Пользователь</th>
+                        <th>Мероприятие</th>
+                        <th>Код</th>
+                        <th>Статус</th>
+                        <th>Дата</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in recent_bookings %}
+                    <tr>
+                        <td>{{ booking.id }}</td>
+                        <td>{{ booking.user.email }}</td>
+                        <td>{{ booking.event.title|truncatewords:3 }}</td>
+                        <td><code>{{ booking.booking_code }}</code></td>
+                        <td>
+                            <span class="badge bg-{% if booking.status == 'confirmed' %}success{% elif booking.status == 'pending' %}warning{% else %}danger{% endif %}">
+                                {{ booking.get_status_display }}
+                            </span>
+                        </td>
+                        <td>{{ booking.created_at|date:"d.m.Y H:i" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center">Нет бронирований</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <a href="{% url 'admin_bookings' %}" class="btn btn-primary">Все бронирования</a>
+    </div>
+</div>
+{% endblock %}
